@@ -1,5 +1,6 @@
 package com.teamsync.task;
 
+import com.teamsync.comment.CommentRepository;
 import com.teamsync.project.Project;
 import com.teamsync.project.ProjectRepository;
 import com.teamsync.workspace.WorkspaceMember;
@@ -30,6 +31,9 @@ class TaskServiceTest {
 
     @Mock
     private WorkspaceMemberRepository memberRepository;
+
+    @Mock
+    private CommentRepository commentRepository;
 
     @InjectMocks
     private TaskService taskService;
@@ -109,7 +113,7 @@ class TaskServiceTest {
     }
 
     @Test
-    void managerCanDeleteAnyTask() {
+    void managerCanDeleteAnyTaskAndItsComments() {
         Task task = someoneElsesTask();
         when(memberRepository.findByWorkspaceIdAndUserId("w1", "caller"))
                 .thenReturn(Optional.of(member(WorkspaceRole.MANAGER)));
@@ -118,6 +122,7 @@ class TaskServiceTest {
 
         taskService.delete("caller", "w1", "p1", "t1");
 
+        verify(commentRepository).deleteByTaskId("t1");
         verify(taskRepository).delete(task);
     }
 }

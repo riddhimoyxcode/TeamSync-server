@@ -1,5 +1,6 @@
 package com.teamsync.task;
 
+import com.teamsync.comment.CommentRepository;
 import com.teamsync.project.ProjectRepository;
 import com.teamsync.workspace.WorkspaceMember;
 import com.teamsync.workspace.WorkspaceMemberRepository;
@@ -16,13 +17,16 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final ProjectRepository projectRepository;
     private final WorkspaceMemberRepository memberRepository;
+    private final CommentRepository commentRepository;
 
     public TaskService(TaskRepository taskRepository,
                        ProjectRepository projectRepository,
-                       WorkspaceMemberRepository memberRepository) {
+                       WorkspaceMemberRepository memberRepository,
+                       CommentRepository commentRepository) {
         this.taskRepository = taskRepository;
         this.projectRepository = projectRepository;
         this.memberRepository = memberRepository;
+        this.commentRepository = commentRepository;
     }
 
     public TaskResponse create(String callerId, String workspaceId, String projectId,
@@ -123,6 +127,7 @@ public class TaskService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot delete this task");
         }
 
+        commentRepository.deleteByTaskId(taskId);
         taskRepository.delete(task);
     }
 
